@@ -1,5 +1,6 @@
 package com.upgrad.quora.api.controller;
 
+import com.upgrad.quora.service.exception.AnswerNotFoundException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
 import org.springframework.http.HttpStatus;
@@ -38,4 +39,24 @@ public class AnswerController {
         return new ResponseEntity<AnswerResponse>(answerResponse, HttpStatus.OK);
     }
 
+    //This endpoint is used to edit an answer.
+    // Only the owner of the answer can edit the answer.
+    @RequestMapping(method = RequestMethod.PUT, path = "/answer/edit/{answerId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<AnswerEditResponse> editAnswerContent(final AnswerEditRequest answerEditRequest, @PathVariable("answerId") final String answerId,
+                                                                @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AnswerNotFoundException {
+
+        UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
+
+        AnswerEntity answerEntity = answerBusinessService.getAnswerFromId(answerId);
+        AnswerEntity checkedAnswer = answerBusinessService.checkAnswerBelongToUser(userAuthEntity,answerEntity);
+
+        checkedAnswer.setAnswer(answerEditRequest.getContent());
+        AnswerEntity updatedAnswer = answerBusinessService.updateAnswer(checkedAnswer);
+
+        AnswerEditResponse answerEditResponse = new AnswerEditResponse().id(updatedAnswer.getUuid()).status("ANSWER EDITED");
+
+
+        return new ResponseEntity<AnswerEditResponse>(answerEditResponse,HttpStatus.OK);
+    }
+    
 }
