@@ -42,7 +42,10 @@ public class QuestionController {
         return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.CREATED);
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/question/all" , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    // This endpoint is used to fetch all the questions that have been posted in the application by any user.
+    // It used the GET request
+    //if user is signedout throws AuthorizationFailedException
+    @RequestMapping(method = RequestMethod.GET, path = "/question/all", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestion(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
 
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
@@ -52,5 +55,20 @@ public class QuestionController {
         List<QuestionDetailsResponse> questionResponse = questionslist(allQuestion);
 
         return new ResponseEntity<List<QuestionDetailsResponse>>(questionResponse, HttpStatus.OK);
+    }
+
+    //This endpoint is used to fetch all the questions posed by a specific user
+    //this is a GET request
+    //throws user not found exception if user is not found
+    @RequestMapping(method = RequestMethod.GET, path = "/question/all/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException, UserNotFoundException {
+
+        final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
+
+        final List<QuestionEntity> allQuestionByUser = questionBusinessService.getAllQuestionsByUser(userId, userAuthEntity);
+
+        return new ResponseEntity<List<QuestionDetailsResponse>>(questionslist(allQuestionByUser), HttpStatus.OK);
+
     }
 }
