@@ -40,7 +40,9 @@ public class UserController {
     @Autowired
     private UserAuthBusinessService userAuthBusinessService;
 
-
+    //This endpoint is used to register a new user in the Quora Application.
+    //It is a POST request
+    //Throws SignUpRestrictedException if email Id provided by the user already exists in the current database
     @RequestMapping(method = RequestMethod.POST , path = "/user/signup" , consumes = MediaType.APPLICATION_JSON_UTF8_VALUE , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupUserResponse> signup(final SignupUserRequest signupUserRequest) throws SignUpRestrictedException {
 
@@ -64,6 +66,9 @@ public class UserController {
         return new ResponseEntity<SignupUserResponse>(userResponse, HttpStatus.CREATED);
     }
 
+    //This endpoint is used for user authentication.
+    //This is a POST method
+    //Throws AuthenticationFailedException, if the username provided by the user does not exist
     @RequestMapping(method = RequestMethod.POST, path = "/user/signin", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SigninResponse> signin(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
 
@@ -82,12 +87,12 @@ public class UserController {
 
     }
 
+    //This endpoint is used to sign out from the Quora Application
+    //This is a POST method
+    //throws SignOutRestrictedException, if access token provided by the user does not exist in the database
     @RequestMapping(method = RequestMethod.POST, path = "/user/signout", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignoutResponse> signout(@RequestHeader("authorization") final String authorization) throws SignOutRestrictedException  {
 
-/*
-        String [] bearerToken = authorization.split("Bearer ");
-*/
         final UserAuthEntity userAuthEntity = userAuthBusinessService.getUserSignOut(authorization);
         UserEntity user = userAuthEntity.getUser();
 

@@ -31,6 +31,9 @@ public class QuestionController {
     @Autowired
     private UserAuthBusinessService userAuthBusinessService;
 
+    //This endpoint is used to create a question in the Quora Application
+    //This is a a POST request
+    //throws AuthorizationFailedException, if the access token provided by the user does not exist in the database
     @RequestMapping(method = RequestMethod.POST, path = "/question/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<QuestionResponse> createQuestion(@RequestHeader("authorization") final String authorization, final QuestionRequest questionRequest) throws AuthorizationFailedException {
 
@@ -50,7 +53,40 @@ public class QuestionController {
         return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.CREATED);
     }
 
+    //This endpoint is used to fetch all the questions that have been posted in the application
+    //this is a a GET request
+    //throws AuthorizationFailedException, If the access token provided by the user does not exist in the database
 
+    @RequestMapping(method = RequestMethod.GET, path = "/question/all" , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestion(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+
+        final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
+
+        final List<QuestionEntity> allQuestion = questionBusinessService.getAllQuestion(userAuthEntity);
+
+        List<QuestionDetailsResponse> questionResponse = questionslist(allQuestion);
+
+        return new ResponseEntity<List<QuestionDetailsResponse>>(questionResponse, HttpStatus.OK);
+    }
+
+    //This endpoint is used to edit a question that has been posted by a user
+    //this is a PUT request.
+    //throws AuthorizationFailedException, If the access token provided by the user does not exist in the database
+    @RequestMapping(method = RequestMethod.PUT , path = "/question/edit/{questionId}" ,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,produces = MediaType.APPLICATION_JSON_UTF8_VALUE )
+    public ResponseEntity<QuestionEditResponse> editQuestionContent(@PathVariable("questionId") final String questionId , @RequestHeader("authorization") final String authorization, QuestionEditRequest questionEditRequest)
+            throws AuthorizationFailedException,InvalidQuestionException {
+
+        final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
+        String content = questionEditRequest.getContent();
+
+        QuestionEntity editedQuestion = questionBusinessService.editQuestionContent(questionId,userAuthEntity, content);
+        QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(editedQuestion.getUuid()).status("QUESTION EDITED");
+
+        return new ResponseEntity<QuestionEditResponse>(questionEditResponse,HttpStatus.OK);
+    }
+
+    //This endpoint is used to delete a question that has been posted by a user
+    //this is a DELETE request
     @RequestMapping(method = RequestMethod.DELETE , path = "/question/delete/{questionId}" ,  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<QuestionDeleteResponse> deleteQuestion(@RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionid )
          throws AuthorizationFailedException , InvalidQuestionException {
@@ -65,19 +101,10 @@ public class QuestionController {
 
     }
 
-
-    @RequestMapping(method = RequestMethod.GET, path = "/question/all" , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestion(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
-
-        final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
-
-        final List<QuestionEntity> allQuestion = questionBusinessService.getAllQuestion(userAuthEntity);
-
-        List<QuestionDetailsResponse> questionResponse = questionslist(allQuestion);
-
-        return new ResponseEntity<List<QuestionDetailsResponse>>(questionResponse, HttpStatus.OK);
-    }
-
+    //This endpoint is used to fetch all the questions posed by a specific user.
+    // this is a GET request.
+    //throws UserNotFoundException, if the user with uuid whose questions are to be retrieved from the database does not exist
+    //throws AuthorizationFailedException, if the access token provided by the user does not exist in the database
     @RequestMapping(method = RequestMethod.GET , path = "/question/all/{userId}" , produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(@PathVariable("userId") final String userId, @RequestHeader("authorization") final String authorization )
         throws AuthorizationFailedException , UserNotFoundException {
@@ -89,20 +116,6 @@ public class QuestionController {
         return new ResponseEntity<List<QuestionDetailsResponse>>(questionslist(allQuestionByUser), HttpStatus.OK);
 
     }
-
-    @RequestMapping(method = RequestMethod.PUT , path = "/question/edit/{questionId}" ,consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,produces = MediaType.APPLICATION_JSON_UTF8_VALUE )
-    public ResponseEntity<QuestionEditResponse> editQuestionContent(@PathVariable("questionId") final String questionId , @RequestHeader("authorization") final String authorization, QuestionEditRequest questionEditRequest)
-    throws AuthorizationFailedException,InvalidQuestionException {
-
-        final UserAuthEntity userAuthEntity = userAuthBusinessService.getUser(authorization);
-        String content = questionEditRequest.getContent();
-
-        QuestionEntity editedQuestion = questionBusinessService.editQuestionContent(questionId,userAuthEntity, content);
-        QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(editedQuestion.getUuid()).status("QUESTION EDITED");
-
-        return new ResponseEntity<QuestionEditResponse>(questionEditResponse,HttpStatus.OK);
-    }
-
 
     public List<QuestionDetailsResponse> questionslist(List<QuestionEntity> allQuestion){
         List<QuestionDetailsResponse> listofquestions = new ArrayList<>();

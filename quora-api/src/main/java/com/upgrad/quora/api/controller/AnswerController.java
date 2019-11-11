@@ -35,6 +35,10 @@ public class AnswerController {
     @Autowired
     private QuestionBusinessService questionBusinessService;
 
+    //This endpoint is used to create an answer to a particular question
+    //this is a POST request
+    //throws InvalidQuestionException, if the question uuid entered by the user whose answer is to be posted does not exist
+    //throws AuthorizationFailedException, if the access token provided by the user does not exist in the database
     @RequestMapping(method = RequestMethod.POST, path = "/question/{questionId}/answer/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AnswerResponse> createAnswer(@RequestHeader("authorization") final String authorization, @PathVariable("questionId") final String questionId, final AnswerRequest answerRequest)
             throws AuthorizationFailedException, InvalidQuestionException {
@@ -58,6 +62,11 @@ public class AnswerController {
         return new ResponseEntity<AnswerResponse>(answerResponse, HttpStatus.OK);
     }
 
+    //This endpoint is used to edit an answer.
+    //Only the owner of the answer can edit the answer.
+    //this is a PUT request
+    //throws AuthorizationFailedException, if the access token provided by the user does not exist in the database
+    //throws AnswerNotFoundException, if the answer with uuid which is to be edited does not exist in the database
     @RequestMapping(method = RequestMethod.PUT, path = "/answer/edit/{answerId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AnswerEditResponse> editAnswerContent(final AnswerEditRequest answerEditRequest, @PathVariable("answerId") final String answerId,
                                                                 @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AnswerNotFoundException {
@@ -76,6 +85,11 @@ public class AnswerController {
         return new ResponseEntity<AnswerEditResponse>(answerEditResponse,HttpStatus.OK);
     }
 
+    //This endpoint is used to delete an answer.
+    //Only the owner of the answer or admin can delete an answer.
+    //this is a DELETE request.
+    //throws AnswerNotFoundException, If the answer with uuid which is to be deleted does not exist in the database
+    //throws AuthorizationFailedException, if the access token provided by the user does not exist in the database
     @RequestMapping(method = RequestMethod.DELETE, path = "/answer/delete/{answerId}",  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AnswerDeleteResponse> deleteAnswer(@PathVariable("answerId") final String answerId, @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, AnswerNotFoundException {
@@ -99,6 +113,9 @@ public class AnswerController {
         return new ResponseEntity<AnswerDeleteResponse>(answerDeleteResponse,HttpStatus.OK);
     }
 
+    //This endpoint is used to get all answers to a particular question
+    //this ios a GET method
+    //throws AuthorizationFailedException, if the access token provided by the user does not exist in the database
     @RequestMapping(method = RequestMethod.GET, path = "answer/all/{questionId}",  produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<AnswerDetailsResponse>> getAllAnswersToQuestion(@PathVariable("questionId") final String questionId, @RequestHeader("authorization") final String authorization)
             throws AuthorizationFailedException, InvalidQuestionException {

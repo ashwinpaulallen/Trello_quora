@@ -17,6 +17,10 @@ public class AdminController {
     @Autowired
     private UserBusinessService userBusinessService;
 
+    //This endpoint is used to delete a user from the Quora Application
+    //it is a a DELETE request
+    //throws AuthorizationFailedException, if the access token provided by the user does not exist in the database
+    //throws AuthorizationFailedException, if the role of the user is 'nonadmin'
     @RequestMapping(method = RequestMethod.DELETE, path = "/admin/user/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UserDeleteResponse> deleteUser(@PathVariable("userId") final String uuid,
                                                          @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, UserNotFoundException {
