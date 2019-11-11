@@ -1,0 +1,82 @@
+package com.upgrad.quora.api.model;
+
+import javax.persistence.Column;
+import javax.persistence.Table;
+
+@Table(name ="user_profile")
+public class UserProfile {
+
+    @Column(name = "uuid")
+    private Integer uuid;
+
+
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
+
+    @Column(name = "mobile_number")
+    private String mobileNumber;
+
+    @Column(name = "password")
+    private String password;
+
+
+    @Column(name ="email_address")
+    private String emailAddress;
+
+    public UserProfile(){
+
+    }
+
+    public Integer getUuid(){
+        return uuid;
+    }
+
+    public void setUuid(Integer uuid){
+        this.uuid = uuid;
+    }
+
+    public String getFirstName(){
+        return firstName;
+    }
+
+    public void setFirstName(String firstName){
+        this.firstName = firstName;
+
+    }
+
+    public String getLastName(){
+        return lastName;
+    }
+
+    public void setLastName(String lastName){
+        this.lastName = lastName;
+    }
+
+    public String getEmailAddress(){
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress){
+        this.emailAddress = emailAddress;
+    }
+
+    public String getMobileNumber(){
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber){
+        this.mobileNumber = mobileNumber;
+    }
+
+    public String getPassword(){
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+}
