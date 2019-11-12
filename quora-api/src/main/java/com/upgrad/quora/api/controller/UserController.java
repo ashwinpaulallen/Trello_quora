@@ -54,6 +54,7 @@ public class UserController {
         userEntity.setPassword(signupUserRequest.getPassword());
         userEntity.setCountry(signupUserRequest.getCountry());
         userEntity.setAboutme(signupUserRequest.getAboutMe());
+        userEntity.setGender(signupUserRequest.getGender());
         userEntity.setDob(signupUserRequest.getDob());
         userEntity.setMobile(signupUserRequest.getContactNumber());
         userEntity.setRole("nonadmin");
